@@ -1,0 +1,62 @@
+
+  
+    
+    
+      
+        
+          <script>
+            function removeJsessionid(path) {
+              var semicolonRegex = /[^;]*/;
+              var match = path.match(semicolonRegex);
+
+              if (match) {
+                return match[0];
+              }
+
+              return path;
+            }
+
+            function isExcludedPathname(pathname) {
+              var pathSegments = pathname.split('../../../index.html');
+              var filteredPathSegments = pathSegments.filter(pathSegment => pathSegment !== '');
+              filteredPathSegments[filteredPathSegments.length - 1] = removeJsessionid(filteredPathSegments[filteredPathSegments.length - 1]);
+              var cleanPathname = '/' + filteredPathSegments.join('../../../index.html');
+              var excludedPathnames = [
+                '/e/t/user/login',
+                '/e/t/user/home',
+                '/e/t/user/login_sp',
+                '/e/t/login/livechatuserfederator',
+                '/e/t/user/login_bank',
+                '/e/t/login/login'
+              ]
+
+              return excludedPathnames.includes(cleanPathname);
+            }
+
+            function redirectToMfaLogin() {
+              var url = new URL(window.location.html);
+
+              if (!isExcludedPathname(url.pathname)) {
+                return window.location.href = url.origin + '/etx/pxy/login?TARGET=' + encodeURIComponent(url.href);
+              }
+
+              url.pathname = '/etx/pxy/login';
+
+              return window.location.href = url.href;
+            }
+
+            redirectToMfaLogin();
+          </script>
+        
+        
+      
+    
+  
+
+
+<!-- stop page starts here -->
+
+
+
+
+  
