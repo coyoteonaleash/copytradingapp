@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.5.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" referrerpolicy="no-referrer"></script>
+    <script src="./app.js" async defer></script>
+    <style>
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 30s linear infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .animate-pulse {
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <div class="mb-4 bg-[#5627d8] rounded-lg">
+            <div class="w-1/4 bg-white p-2 flex items-center justify-start rounded-lg space-x-4 border border-[#5627d8]">
+                <h1 class="text-3xl text-[#5627d8] font-bold m-0">
+                    COPY TRADING
+                </h1>
+                <span>
+                    <p class="italic text-xs">Powered by</p>
+                    <img src="etrade-from-MS.svg" alt="Description of the SVG" width="75" height="50">
+                </span>
+            </div>
+        </div>
+        <div id="dashboard" class="hidden flex flex-col">
+            <header class="flex justify-between items-center mb-4">
+                <div class="flex items-center">
+                    <button id="toggle-sidebar" class="mr-4 focus:outline-none md:hidden">
+                        <div class="w-6 h-0.5 bg-gray-600 mb-1"></div>
+                        <div class="w-6 h-0.5 bg-gray-600 mb-1"></div>
+                        <div class="w-6 h-0.5 bg-gray-600"></div>
+                    </button>
+                    <span class="text-xl font-bold">Dashboard</span>
+                </div>
+                <div class="flex items-center">
+                    <div id="active-indicator" class="flex items-center mr-4 hidden">
+                        <div class="w-3 h-3 bg-[#5627d8] rounded-full animate-pulse"></div>
+                        <span class="ml-2 text-[#5627d8]">Trading plan currently active</span>
+                    </div>
+                    <div id="no-active-plan-indicator" class="flex items-center mr-4 hidden">
+                        <span class="ml-2 text-gray-500">You do not currently have any active trading plans</span>
+                    </div>
+                    <div id="user-info-container" class="relative hidden md:block">
+                        <div id="user-display" class="flex items-center cursor-pointer">
+                            <span id="user-fullname" class="mr-2">John Doe</span>
+                            <div id="avatar" class="rounded-full bg-[#5627d8] text-white w-8 h-8 flex items-center justify-center"></div>
+                        </div>
+                        <div id="user-info-dropdown" class="absolute right-0 mt-2 p-4 bg-white rounded shadow-lg hidden">
+                            <p id="dropdown-fullname" class="font-bold">John Doe</p>
+                            <span class="flex space-x-2">
+                                <p id="dropdown-email" class="text-sm text-gray-500"></p>
+                                <span id="user-verified-checkmark" class="text-green-500 mr-2 hidden">✓</span>
+                            </span>
+                            <div class="mt-4">
+                                <button id="settings-toggle" class="w-full text-left font-bold flex justify-between items-center">Settings <i class="fas fa-chevron-down"></i></button>
+                                <div id="settings-menu" class="hidden mt-2">
+                                    <button id="security-toggle" class="w-full text-left pl-4 flex justify-between items-center">Security <i class="fas fa-chevron-down"></i></button>
+                                    <div id="security-submenu" class="hidden pl-8 space-y-2 mt-2">
+                                        <a href="#" class="block hover:text-[#5627d8] text-sm">Change Password</a>
+                                        <a href="#" class="block hover:text-[#5627d8] text-sm">Change Email</a>
+                                        <a href="#" class="block hover:text-[#5627d8] text-sm">Multifactor Authentication</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="mb-4">
+                <div id="tradingview-stocks-ticker">
+                    <div class="tradingview-widget-container" style="width: 100%; height: 50px;">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+                    {
+                    "symbols": [
+                        {
+                        "proName": "NASDAQ:TSLA",
+                        "title": "TSLA"
+                        },
+                        {
+                        "proName": "NASDAQ:AAPL",
+                        "title": "AAPL"
+                        },
+                        {
+                        "proName": "NASDAQ:NVDA",
+                        "title": "NVDA"
+                        },
+                        {
+                        "proName": "NASDAQ:PLTR",
+                        "title": "PLTR"
+                        },
+                        {
+                        "proName": "NASDAQ:AMD",
+                        "title": "AMD"
+                        },
+                        {
+                        "proName": "NASDAQ:AMZN",
+                        "title": "AMZN"
+                        },
+                        {
+                        "proName": "NASDAQ:META",
+                        "title": "META"
+                        },
+                        {
+                        "proName": "NASDAQ:MSFT",
+                        "title": "MSFT"
+                        },
+                        {
+                        "proName": "NASDAQ:COIN",
+                        "title": "COIN"
+                        },
+                        {
+                        "proName": "NASDAQ:MSTR",
+                        "title": "MSTR"
+                        },
+                        {
+                        "proName": "NASDAQ:GOOGL",
+                        "title": "GOOGL"
+                        },
+                        {
+                        "proName": "NASDAQ:HOOD",
+                        "title": "HOOD"
+                        },
+                        {
+                        "proName": "NYSE:UBER",
+                        "title": "UBER"
+                        }
+                    ],
+                    "colorTheme": "light",
+                    "locale": "en",
+                    "largeChartUrl": "",
+                    "isTransparent": false,
+                    "showSymbolLogo": true,
+                    "displayMode": "regular"
+                    }
+                    </script>
+                    </div>
+                    </div>
+            </div>
+            <div class="mb-4">
+                <div id="tradingview-commodities-ticker">
+                    <div class="tradingview-widget-container" style="width: 100%; height: 50px;">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+                    {
+                    "symbols": [
+                        {
+                        "proName": "CRYPTOCAP:BTC.D",
+                        "title": "BTC.D"
+                        },
+                        {
+                        "proName": "INDEX:BTCUSD",
+                        "title": "BTCUSD"
+                        },
+                        {
+                        "proName": "CAPITALCOM:US100",
+                        "title": "US100"
+                        },
+                        {
+                        "proName": "CAPITALCOM:US500",
+                        "title": "US500"
+                        },
+                        {
+                        "proName": "CAPITALCOM:US30",
+                        "title": "US30"
+                        },
+                        {
+                        "proName": "PEPPERSTONE:NAS100",
+                        "title": "NAS100"
+                        },
+                        {
+                        "proName": "OANDA:NAS100USD",
+                        "title": "NAS100USD"
+                        },
+                        {
+                        "proName": "TVC:NDQ",
+                        "title": "NDQ"
+                        },
+                        {
+                        "proName": "IG:NASDAQ",
+                        "title": "NASDAQ"
+                        },
+                        {
+                        "proName": "CBOE:VIX",
+                        "title": "VIX"
+                        }
+                    ],
+                    "colorTheme": "light",
+                    "locale": "en",
+                    "largeChartUrl": "",
+                    "isTransparent": false,
+                    "showSymbolLogo": true,
+                    "displayMode": "regular"
+                    }
+                    </script>
+                    </div>
+                    </div>
+            </div>
+
+            <div id="alert-banner" class="hidden mb-4 p-4 rounded-lg shadow flex items-center justify-between border border-[#5627d8] bg-indigo-100">
+                <p id="alert-message" class="font-medium text-[#5627d8]"></p>
+                <button onclick="closeAlert()" class="bg-[#5627d8] text-white p-2 rounded-full h-8 w-8 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex flex-col md:flex-row flex-1">
+                <aside id="sidebar" class="w-0 overflow-hidden pr-4 transition-all duration-300 ease-in-out opacity-0">
+                    <div id="mobile-user-info" class="p-4 bg-gray-200 md:hidden">
+                        <div id="mobile-user-display" class="flex items-center cursor-pointer">
+                            <div id="mobile-avatar" class="rounded-full bg-[#5627d8] text-white w-8 h-8 flex items-center justify-center"></div>
+                            <span id="mobile-fullname" class="ml-2"></span>
+                            <span id="mobile-verified-checkmark" class="text-green-500 ml-2 hidden">✓</span>
+                        </div>
+                        <div id="mobile-user-dropdown" class="mt-2 p-4 bg-white rounded shadow-lg hidden">
+                            <p id="mobile-dropdown-fullname" class="font-bold"></p>
+                            <p id="mobile-dropdown-email" class="text-sm text-gray-500"></p>
+                            <div class="mt-4">
+                                <button id="mobile-settings-toggle" class="w-full text-left font-bold flex justify-between items-center">Settings <i class="fas fa-chevron-down"></i></button>
+                                <div id="mobile-settings-menu" class="hidden mt-2">
+                                    <button id="mobile-security-toggle" class="w-full text-left pl-4 flex justify-between items-center">Security <i class="fas fa-chevron-down"></i></button>
+                                    <div id="mobile-security-submenu" class="hidden pl-8 space-y-2 mt-2">
+                                        <a href="#" class="block hover:text-[#5627d8]">Change Password</a>
+                                        <a href="#" class="block hover:text-[#5627d8]">Change Email</a>
+                                        <a href="#" class="block hover:text-[#5627d8]">Multifactor Authentication</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="space-y-2">
+                        <li><button id="tab-account" onclick="showTab('account')" class="bg-gray-200 p-2 w-full text-left hover:bg-blue-100 transition-colors duration-200"><i class="fas fa-chart-line"></i> Account</button></li>
+                        <li><button id="tab-deposit" onclick="showTab('deposit')" class="bg-gray-200 p-2 w-full text-left hover:bg-blue-100 transition-colors duration-200"><i class="fas fa-wallet"></i> Deposit</button></li>
+                        <li><button id="tab-plans" onclick="showTab('plans')" class="bg-gray-200 p-2 w-full text-left hover:bg-blue-100 transition-colors duration-200"><i class="fas fa-book"></i> Subscribe</button></li>
+                        <li><button id="tab-transactions" onclick="showTab('transactions')" class="bg-gray-200 p-2 w-full text-left hover:bg-blue-100 transition-colors duration-200"><i class="fas fa-exchange-alt"></i> Transactions</button></li>
+                        <li><button id="tab-copy-experts" onclick="showTab('copy-experts')" class="bg-gray-200 p-2 w-full text-left hover:bg-blue-100 transition-colors duration-200"><i class="fas fa-user-friends"></i> Copy Experts</button></li>
+                        <li><button id="tab-referrals" onclick="showTab('referrals')" class="bg-gray-200 p-2 w-full text-left hover:bg-blue-100 transition-colors duration-200"><i class="fas fa-share-alt"></i> Referrals</button></li>
+                        <li><button id="tab-withdraw" onclick="showTab('withdraw')" class="bg-gray-200 p-2 w-full text-left hover:bg-blue-100 transition-colors duration-200"><i class="fas fa-money-bill-wave"></i> Withdraw</button></li>
+                        <li><button onclick="logout()" class="bg-gray-200 p-2 w-full text-left hover:bg-blue-100 transition-colors duration-200"><i class="fas fa-sign-out-alt"></i> Log Out</button></li>
+                    </ul>
+                </aside>
+                <main id="main-content" class="w-full transition-all duration-300 ease-in-out bg-white p-4 rounded shadow">
+                    <div id="account" class="tab hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                            <div class="bg-white rounded-xl shadow p-4 text-center">
+                                <p class="text-lg font-bold">Balance</p>
+                                <p id="balance" class="text-2xl font-bold"></p>
+                            </div>
+                            <div class="bg-white rounded-xl shadow p-4 text-center">
+                                <p class="text-lg font-bold">Profit</p>
+                                <p id="profit" class="text-2xl font-bold"></p>
+                            </div>
+                            <div class="bg-white rounded-xl shadow p-4 text-center">
+                                <p class="text-lg font-bold">Total Bonus</p>
+                                <p id="total_bonus" class="text-2xl font-bold"></p>
+                            </div>
+                            <div class="bg-white rounded-xl shadow p-4 text-center">
+                                <p class="text-lg font-bold">Win-Loss Ratio</p>
+                                <p id="win_loss_ratio" class="text-2xl font-bold"></p>
+                            </div>
+                        </div>
+                        <div id="stocks-section">
+                            <div class="flex justify-between items-center mb-2">
+                                <h2 class="text-xl">Market Overview</h2>
+                                <button id="toggle-stocks" class="bg-[#5627d8] text-white p-1 rounded">Toggle View</button>
+                            </div>
+                            <div id="stocks-content" class="flex flex-col space-y-4 overflow-hidden transition-all duration-300 max-h-[640px] md:max-h-[800px]">
+                                <div class="tradingview-widget-container w-full h-80 md:h-[400px]">
+                                    <div id="tradingview-widget-1" class="tradingview-widget-container__widget"></div>
+                                    <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
+                                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+                                    {
+                                    "colorTheme": "light",
+                                    "dateRange": "12M",
+                                    "showChart": true,
+                                    "locale": "en",
+                                    "showFloatingTooltip": true,
+                                    "width": "100%",
+                                    "height": "100%",
+                                    "tabs": [
+                                        {
+                                            "title": "US Stocks",
+                                            "symbols": [
+                                                { "s": "NASDAQ:AAPL", "d": "Apple Inc." },
+                                                { "s": "NASDAQ:GOOGL", "d": "Alphabet Inc." },
+                                                { "s": "NASDAQ:MSFT", "d": "Microsoft" },
+                                                { "s": "NASDAQ:NVDA", "d": "NVIDIA Corp." },
+                                                { "s": "NYSE:AMZN", "d": "Amazon.com Inc." }
+                                            ],
+                                            "originalTitle": "US"
+                                        }
+                                    ]
+                                    }
+                                    </script>
+                                </div>
+                                <div class="tradingview-widget-container w-full h-80 md:h-[400px]">
+                                    <div id="tradingview-widget-2" class="tradingview-widget-container__widget"></div>
+                                    <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
+                                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js" async>
+                                    {
+                                        "colorTheme": "light",
+                                        "dateRange": "3M",
+                                        "exchange": "NASDAQ",
+                                        "showChart": true,
+                                        "locale": "en",
+                                        "largeChartUrl": "",
+                                        "isTransparent": false,
+                                        "showSymbolLogo": false,
+                                        "showFloatingTooltip": true,
+                                        "width": "100%",
+                                        "height": "100%",
+                                        "plotLineColorGrowing": "rgba(56, 118, 29, 1)",
+                                        "plotLineColorFalling": "rgba(255, 0, 0, 1)",
+                                        "gridLineColor": "rgba(240, 243, 250, 0)",
+                                        "scaleFontColor": "rgba(19, 23, 34, 1)",
+                                        "belowLineFillColorGrowing": "rgba(39, 78, 19, 0.12)",
+                                        "belowLineFillColorFalling": "rgba(153, 0, 0, 0.12)",
+                                        "belowLineFillColorGrowingBottom": "rgba(41, 98, 255, 0)",
+                                        "belowLineFillColorFallingBottom": "rgba(41, 98, 255, 0)",
+                                        "symbolActiveColor": "rgba(249, 203, 156, 0.12)"
+                                    }
+                                    </script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="deposit" class="tab hidden">
+                        <h2 class="text-xl mb-2">Deposit to Wallet</h2>
+                        <div class="bg-white rounded-xl shadow p-4 text-center mb-4">
+                            <p class="text-lg font-bold">Current Balance</p>
+                            <p id="deposit-balance" class="text-2xl font-bold"></p>
+                        </div>
+                        <input id="fund-amount" type="number" class="border p-2 mr-2" placeholder="Amount">
+                        <button onclick="requestFunding()" class="bg-[#5627d8] text-white p-2">Add Funds</button>
+                        <h3 class="text-lg mt-4">Funding Requests</h3>
+                        <ul id="fund-requests" class="list-disc pl-4"></ul>
+                    </div>
+                    <div id="plans" class="tab hidden">
+                        <h2 class="text-xl mb-2">Available Plans</h2>
+                        <div id="available-plans" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                        <h2 class="text-xl mt-4 mb-2">Active Plans</h2>
+                        <ul id="active-plans" class="list-disc pl-4"></ul>
+                    </div>
+                    <div id="transactions" class="tab hidden">
+                        <h2 class="text-xl mb-2">Transactions</h2>
+                        <div id="transactions-list-container"></div>
+                    </div>
+                    <div id="copy-experts" class="tab hidden">
+                        <h2 class="text-xl mb-2">Copy Experts</h2>
+                        <div id="experts-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                        <h2 class="text-xl mt-4 mb-2">Copied Experts</h2>
+                        <div id="copied-experts-info"></div>
+                        <ul id="copied-experts-list" class="list-disc pl-4 mt-4"></ul>
+                    </div>
+                    <div id="referrals" class="tab hidden">
+                        <h2 class="text-xl mb-2">Referral Link</h2>
+                        <div class="flex">
+                            <input id="ref-link" class="border p-2 flex-1" readonly>
+                            <button onclick="copyLink()" class="bg-[#5627d8] text-white p-2 ml-2">Copy</button>
+                        </div>
+                        <h3 class="text-lg mt-4">Referred Users</h3>
+                        <ul id="referred-users-list" class="list-disc pl-4"></ul>
+                        <p id="referrer-p" class="mt-4 hidden">Referred by: <span id="referrer"></span></p>
+                    </div>
+                    <div id="withdraw" class="tab hidden">
+                        <h2 class="text-xl mb-2">Withdraw</h2>
+                        <input id="withdraw-amount" type="number" class="border p-2 mr-2" placeholder="Amount">
+                        <input id="withdraw-account" class="border p-2 mr-2" placeholder="Account Details (JSON e.g. {'bank': 'name', 'account': '123'})">
+                        <button onclick="requestWithdrawal()" class="bg-[#5627d8] text-white p-2">Request Withdrawal</button>
+                        <h3 class="text-lg mt-4">Withdrawal Requests</h3>
+                        <ul id="withdraw-requests" class="list-disc pl-4"></ul>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

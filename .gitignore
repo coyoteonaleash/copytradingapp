@@ -1,0 +1,5 @@
+.venv/
+website/
+.env
+seed.py
+**/__pycache__/
