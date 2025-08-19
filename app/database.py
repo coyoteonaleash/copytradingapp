@@ -1,12 +1,11 @@
-# File: database.py
 import motor.motor_asyncio
+from motor.motor_asyncio import AsyncIOMotorClient
 from os import getenv
 from dotenv import load_dotenv
 
 load_dotenv()
-MONGO_URL = getenv("MONGO_URL")
-client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
-db = client.get_default_database()
+client = AsyncIOMotorClient("mongodb://localhost:27017")
+db = client.get_default_database("copytrading")  # Add the database name here
 
 users = db.users
 experts = db.experts

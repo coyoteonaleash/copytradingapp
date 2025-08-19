@@ -102,7 +102,12 @@ async def verify(ver: Verify):
 
 @router.post("/login")
 async def login(log: Login):
+    print(f"Attempting login for email: {log.email}")
     user = await users.find_one({"email": log.email})
+    print(f"User found: {user is not None}")
+    if user:
+        print(f"User verified: {user.get('verified', 'missing')}")
+        print(f"Password match: {pwd_context.verify(log.password, user['password_hash'])}")
     if not user or not pwd_context.verify(log.password, user["password_hash"]) or not user["verified"]:
         raise HTTPException(400, "Invalid credentials")
     jwt_token = create_token({"email": log.email, "role": user["role"]})
