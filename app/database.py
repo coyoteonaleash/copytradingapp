@@ -4,8 +4,8 @@ from os import getenv
 from dotenv import load_dotenv
 
 load_dotenv()
-client = AsyncIOMotorClient("mongodb://localhost:27017")
-db = client.get_default_database("copytrading")  # Add the database name here
+client = AsyncIOMotorClient(getenv("MONGODB_URL"))
+db = client.get_default_database("copytrading")
 
 users = db.users
 experts = db.experts
